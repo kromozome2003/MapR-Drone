@@ -1,3 +1,4 @@
 .DS_Store
 /*.jpg
 .idea
+Containers/ubuntu-baseline/mapr-docker-client.sh
