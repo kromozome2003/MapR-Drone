@@ -68,4 +68,4 @@ MAPR_DOCKER_ARGS="$MAPR_DOCKER_SECURITY \
   -v $MAPR_TICKET_FILE:$MAPR_TICKETFILE_LOCATION:ro"
 [ -d /sys/fs/cgroup ] && MAPR_DOCKER_ARGS="$MAPR_DOCKER_ARGS -v /sys/fs/cgroup:/sys/fs/cgroup:ro"
 
-docker run --rm -it $MAPR_DOCKER_ARGS drone-client:latest "$@"
+docker run --rm -it -p 5000:5000 $MAPR_DOCKER_ARGS drone-client:latest "$@"

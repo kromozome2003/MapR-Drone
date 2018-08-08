@@ -2,3 +2,4 @@
 /*.jpg
 .idea
 Containers/ubuntu-baseline/mapr-docker-client.sh
+mapr-setup.sh

@@ -20,7 +20,6 @@ RUN sudo pip install av
 RUN sudo pip install requests
 RUN sudo apt-get install -y python-opencv
 RUN sudo pip install image
-RUN sudo pip install pillow
 RUN sudo apt-get install -y python-numpy
 RUN sudo pip install Flask
 
@@ -33,3 +32,6 @@ RUN sudo pip install --global-option=build_ext --global-option="--library-dirs=/
 
 # Copy scripts
 COPY stream_drone_video.py /home/mapr/
+COPY consumer-flask.py /home/mapr/
+COPY video.mp4 /home/mapr/
+COPY producer-flask.py /home/mapr/
