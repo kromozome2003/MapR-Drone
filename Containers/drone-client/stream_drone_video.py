@@ -1,6 +1,7 @@
 import sys,traceback,argparse,requests,base64
 import tellopy
-import av,cv2,numpy
+import av,numpy
+#import cv2
 import time
 import cStringIO
 from requests.utils import quote

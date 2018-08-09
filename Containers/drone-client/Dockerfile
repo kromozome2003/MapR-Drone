@@ -25,6 +25,9 @@ RUN sudo pip install Flask
 
 # Python lib for Ryze (DJI) Tello drone
 RUN sudo pip install tellopy
+EXPOSE 5000/tcp
+EXPOSE 9000/udp
+EXPOSE 6038/udp
 
 # MapR-ES setup
 RUN export LD_LIBRARY_PATH=/opt/mapr/lib:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server
