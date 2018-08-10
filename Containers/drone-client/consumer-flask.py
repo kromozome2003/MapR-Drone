@@ -1,7 +1,13 @@
+import sys
 from flask import Flask, Response
 from confluent_kafka import Consumer, KafkaError
+
+# Parse args
+topic = str(sys.argv[1])
+
+# Build consumer
 consumer = Consumer({'group.id': 'mygroup', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
-consumer.subscribe(['/demos/drone/drone1:frames'])
+consumer.subscribe([topic])
 
 app = Flask(__name__)
 

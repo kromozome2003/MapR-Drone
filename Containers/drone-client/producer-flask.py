@@ -1,10 +1,13 @@
-import time
-import cv2
+import time, cv2, sys
 from confluent_kafka import Producer
-#  connect to Kafka
-producer = Producer({'streams.producer.default.stream': '/demos/drone/drone1'})
-# Assign a topic
-topic = 'frames'
+
+# Parse args
+data = sys.argv[1].split(":")
+stream = str(data[0])
+topic = str(data[1])
+
+# Create the producer
+producer = Producer({'streams.producer.default.stream': stream})
 
 def video_emitter(video):
     # Open the video
