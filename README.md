@@ -55,7 +55,8 @@ Assuming your MapR cluster/sandbox is up & running with IP 182.168.56.101 (VBox 
 ### Run the container
 ```
 chmod +x Containers/drone-client/docker_images/client/mapr-docker-client.sh
-Containers/drone-client/run_container.sh
+cd Containers/drone-client
+./run_container.sh
 ```
 ### Once in the container shell, run the producer/consumer/drone-stream
 ```
