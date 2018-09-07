@@ -6,7 +6,7 @@ from confluent_kafka import Consumer, KafkaError
 topic = str(sys.argv[1])
 
 # Build consumer
-consumer = Consumer({'group.id': 'mygroup', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
+consumer = Consumer({'group.id': 'capture', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
 consumer.subscribe([topic])
 
 app = Flask(__name__)
@@ -33,4 +33,4 @@ def kafkastream():
 	consumer.close()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True, debug=True)
+    app.run(host='0.0.0.0', port=5000, threaded=True, debug=True)

@@ -38,3 +38,6 @@ COPY stream_drone_video.py /home/mapr/
 COPY consumer-flask.py /home/mapr/
 COPY video.mp4 /home/mapr/
 COPY producer-flask.py /home/mapr/
+COPY startup.sh /home/mapr/
+RUN sudo chmod +x /home/mapr/startup.sh
+CMD /home/mapr/startup.sh
