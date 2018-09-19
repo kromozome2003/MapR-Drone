@@ -10,7 +10,7 @@ def main():
         # Init a video stream
         container = av.open(drone.get_video_stream())
         # Take Off
-        #drone.takeoff()
+        drone.takeoff()
         # Start Chrono
         start_time = int(time.time())
         timeout = True

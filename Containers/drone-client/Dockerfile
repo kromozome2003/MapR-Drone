@@ -1,4 +1,4 @@
-FROM maprtech/pacc:6.0.1_5.0.0_ubuntu16_yarn_fuse_streams
+FROM maprtech/pacc:6.0.1_5.0.0_ubuntu16_yarn_streams
 
 # System
 RUN sudo apt-get update -y
@@ -21,11 +21,9 @@ RUN sudo pip install requests
 RUN sudo apt-get install -y python-opencv
 RUN sudo pip install image
 RUN sudo apt-get install -y python-numpy
-RUN sudo pip install Flask
 
 # Python lib for Ryze (DJI) Tello drone
 RUN sudo pip install tellopy
-EXPOSE 5000/tcp
 EXPOSE 9000/udp
 EXPOSE 6038/udp
 
@@ -35,9 +33,8 @@ RUN sudo pip install --global-option=build_ext --global-option="--library-dirs=/
 
 # Copy scripts
 COPY stream_drone_video.py /home/mapr/
-COPY consumer-flask.py /home/mapr/
 COPY video.mp4 /home/mapr/
-COPY producer-flask.py /home/mapr/
+COPY video-producer.py /home/mapr/
 COPY startup.sh /home/mapr/
 RUN sudo chmod +x /home/mapr/startup.sh
-#CMD /home/mapr/startup.sh
+CMD /home/mapr/startup.sh
