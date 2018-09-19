@@ -19,14 +19,20 @@ def index():
 def kafkastream():
 	running = True
 	frameId = 0
+	print('Start of loop')
 	while running:
-		msg = consumer.poll(timeout=1.0)
-		if msg is None: continue
+		print('  Polling message')
+		msg = consumer.poll(timeout=0.200)
+		print('  Message obtained')
+		if msg is None:
+			print('  Message is None')
+			continue
 		if not msg.error():
-			print('receiving frame ' + str(frameId))
+			print('  Message is valid, receiving frame ' + str(frameId))
 			yield (b'--frame\r\n'
 				b'Content-Type: image/png\r\n\r\n' + msg.value() + b'\r\n\r\n')
   		elif msg.error().code() != KafkaError._PARTITION_EOF:
+			print('  Bad message')
 			print(msg.error())
 			running = False
 		frameId += 1

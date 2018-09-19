@@ -21,17 +21,14 @@ RUN sudo pip install requests
 RUN sudo apt-get install -y python-opencv
 RUN sudo pip install image
 RUN sudo apt-get install -y python-numpy
-RUN sudo pip install Flask
 
-EXPOSE 5001/tcp
+EXPOSE 5003/tcp
 
 # MapR-ES setup
 RUN export LD_LIBRARY_PATH=/opt/mapr/lib:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server
 RUN sudo pip install --global-option=build_ext --global-option="--library-dirs=/opt/mapr/lib" --global-option="--include-dirs=/opt/mapr/include/" mapr-streams-python
 
 # Copy scripts
-COPY consumer-flask.py /home/mapr/
-COPY resize-img.py /home/mapr/
 COPY startup.sh /home/mapr/
 RUN sudo chmod +x /home/mapr/startup.sh
 #CMD /home/mapr/startup.sh
