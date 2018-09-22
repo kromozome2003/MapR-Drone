@@ -37,6 +37,7 @@ while running:
 		dst_image_io = StringIO.StringIO()
 		dst_image.save(dst_image_io, format='PNG')
 		producer.produce(dst_topic, dst_image_io.getvalue())
+		producer.flush()
  	elif msg.error().code() != KafkaError._PARTITION_EOF:
 		print(msg.error())
 		running = False

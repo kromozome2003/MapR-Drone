@@ -1,16 +1,19 @@
-import sys
+import sys,time
 from flask import Flask, render_template, Response
 from confluent_kafka import Consumer, KafkaError
 
 # Parse args
-#topic = str(sys.argv[1])
+topic1 = str(sys.argv[1])
+topic2 = str(sys.argv[2])
+topic3 = str(sys.argv[3])
 
 # Build consumer
-consumer_frames = Consumer({'group.id': 'capture', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
-consumer_frames.subscribe(['/demos/drone/drone1:frames'])
-
-consumer_resized = Consumer({'group.id': 'capture', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
-consumer_resized.subscribe(['/demos/drone/drone1:resized'])
+consumer_frames = Consumer({'group.id': 'frontui_frames', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
+consumer_frames.subscribe([topic1])
+consumer_resized = Consumer({'group.id': 'frontui_resized', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
+consumer_resized.subscribe([topic2])
+consumer_analyzed = Consumer({'group.id': 'frontui_analyzed', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
+consumer_analyzed.subscribe([topic3])
 
 app = Flask(__name__)
 
@@ -20,19 +23,23 @@ def video():
 
 @app.route('/video_feed_frames')
 def video_feed_frames():
-	return Response(kafkastream_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+	return Response(stream_frames(consumer_frames), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video_feed_resized')
 def video_feed_resized():
-	return Response(kafkastream_resized(), mimetype='multipart/x-mixed-replace; boundary=frame')
+	return Response(stream_resized(consumer_resized), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-def kafkastream_frames():
+@app.route('/video_feed_analyzed')
+def video_feed_analyzed():
+	return Response(stream_analyzed(consumer_analyzed), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+def stream_frames(consumer):
 	running = True
 	frameId = 0
 	print('Start of loop')
 	while running:
 		print('  Polling message')
-		msg = consumer_frames.poll(timeout=0.200)
+		msg = consumer.poll(timeout=0.300)
 		print('  Message obtained')
 		if msg is None:
 			print('  Message is None')
@@ -46,15 +53,15 @@ def kafkastream_frames():
 			print(msg.error())
 			running = False
 		frameId += 1
-	consumer_frames.close()
+	consumer.close()
 
-def kafkastream_resized():
+def stream_resized(consumer):
 	running = True
 	frameId = 0
 	print('Start of loop')
 	while running:
 		print('  Polling message')
-		msg = consumer_resized.poll(timeout=0.200)
+		msg = consumer.poll(timeout=0.300)
 		print('  Message obtained')
 		if msg is None:
 			print('  Message is None')
@@ -68,7 +75,29 @@ def kafkastream_resized():
 			print(msg.error())
 			running = False
 		frameId += 1
-	consumer_resized.close()
+	consumer.close()
+
+def stream_analyzed(consumer):
+	running = True
+	frameId = 0
+	print('Start of loop')
+	while running:
+		print('  Polling message')
+		msg = consumer.poll(timeout=0.300)
+		print('  Message obtained')
+		if msg is None:
+			print('  Message is None')
+			continue
+		if not msg.error():
+			print('  Message is valid, receiving frame ' + str(frameId))
+			yield (b'--frame\r\n'
+				b'Content-Type: image/png\r\n\r\n' + msg.value() + b'\r\n\r\n')
+  		elif msg.error().code() != KafkaError._PARTITION_EOF:
+			print('  Bad message')
+			print(msg.error())
+			running = False
+		frameId += 1
+	consumer.close()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

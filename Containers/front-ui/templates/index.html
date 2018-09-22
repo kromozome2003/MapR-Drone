@@ -1,11 +1,25 @@
 <html>
   <head>
-    <title>Exemple</title>
+    <title>MapR Distributed Image Processing</title>
   </head>
   <body>
-    <h1>Source</h1>
-    <img src="video_feed_frames">
-    <h1>Resized</h1>
-    <img src="video_feed_resized">
+    <h1>Distributed Image Processing</h1>
+    <table style="width:100%">
+    <tr>
+      <th width="33%">Source</th>
+      <th width="33%">Resized</th>
+      <th width="33%">Detection</th>
+    </tr>
+    <tr>
+      <th>drone1:frames</th>
+      <th>drone1:resized</th>
+      <th>drone1:analyzed</th>
+    </tr>
+    <tr>
+      <td><img src="video_feed_frames" width="300px"></td>
+      <td><img src="video_feed_resized" width="200px"></td>
+      <td><img src="video_feed_analyzed" width="200px"></td>
+    </tr>
+  </table>
   </body>
 </html>

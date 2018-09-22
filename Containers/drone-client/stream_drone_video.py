@@ -10,7 +10,7 @@ def main():
         # Init a video stream
         container = av.open(drone.get_video_stream())
         # Take Off
-        drone.takeoff()
+        #drone.takeoff()
         # Start Chrono
         start_time = int(time.time())
         timeout = True
@@ -26,6 +26,7 @@ def main():
                     ret, jpeg = cv2.imencode('.png', frameIMG)
                     print('  ###  Streaming frame : ' + img_name_str)
                     producer.produce(topic, jpeg.tobytes())
+                    producer.flush()
 
                 # Time control
                 elapsed_time = int(time.time() - start_time)
