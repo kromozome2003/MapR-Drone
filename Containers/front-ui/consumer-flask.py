@@ -6,6 +6,11 @@ from confluent_kafka import Consumer, KafkaError
 topic1 = str(sys.argv[1])
 topic2 = str(sys.argv[2])
 topic3 = str(sys.argv[3])
+#topic1 = '/demos/drone/drone1:frames'
+#topic2 = '/demos/drone/drone1:resized'
+#topic3 = '/demos/drone/drone1:analyzed'
+
+sleep_time = .1
 
 # Build consumer
 consumer_frames = Consumer({'group.id': 'frontui_frames', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
@@ -39,20 +44,20 @@ def stream_frames(consumer):
 	print('Start of loop')
 	while running:
 		print('  Polling message')
-		msg = consumer.poll(timeout=0.300)
+		msg = consumer.poll(timeout=0.100)
 		print('  Message obtained')
 		if msg is None:
 			print('  Message is None')
 			continue
 		if not msg.error():
 			print('  Message is valid, receiving frame ' + str(frameId))
-			yield (b'--frame\r\n'
-				b'Content-Type: image/png\r\n\r\n' + msg.value() + b'\r\n\r\n')
+			yield (b'--frame\r\n' + b'Content-Type: image/png\r\n\r\n' + msg.value() + b'\r\n\r\n')
+			time.sleep(sleep_time)
+			frameId += 1
   		elif msg.error().code() != KafkaError._PARTITION_EOF:
 			print('  Bad message')
 			print(msg.error())
 			running = False
-		frameId += 1
 	consumer.close()
 
 def stream_resized(consumer):
@@ -61,20 +66,20 @@ def stream_resized(consumer):
 	print('Start of loop')
 	while running:
 		print('  Polling message')
-		msg = consumer.poll(timeout=0.300)
+		msg = consumer.poll(timeout=0.100)
 		print('  Message obtained')
 		if msg is None:
 			print('  Message is None')
 			continue
 		if not msg.error():
 			print('  Message is valid, receiving frame ' + str(frameId))
-			yield (b'--frame\r\n'
-				b'Content-Type: image/png\r\n\r\n' + msg.value() + b'\r\n\r\n')
+			yield (b'--frame\r\n' + b'Content-Type: image/png\r\n\r\n' + msg.value() + b'\r\n\r\n')
+			time.sleep(sleep_time)
+			frameId += 1
   		elif msg.error().code() != KafkaError._PARTITION_EOF:
 			print('  Bad message')
 			print(msg.error())
 			running = False
-		frameId += 1
 	consumer.close()
 
 def stream_analyzed(consumer):
@@ -83,20 +88,20 @@ def stream_analyzed(consumer):
 	print('Start of loop')
 	while running:
 		print('  Polling message')
-		msg = consumer.poll(timeout=0.300)
+		msg = consumer.poll(timeout=0.100)
 		print('  Message obtained')
 		if msg is None:
 			print('  Message is None')
 			continue
 		if not msg.error():
 			print('  Message is valid, receiving frame ' + str(frameId))
-			yield (b'--frame\r\n'
-				b'Content-Type: image/png\r\n\r\n' + msg.value() + b'\r\n\r\n')
+			yield (b'--frame\r\n' + b'Content-Type: image/png\r\n\r\n' + msg.value() + b'\r\n\r\n')
+			frameId += 1
+			time.sleep(sleep_time)
   		elif msg.error().code() != KafkaError._PARTITION_EOF:
 			print('  Bad message')
 			print(msg.error())
 			running = False
-		frameId += 1
 	consumer.close()
 
 if __name__ == '__main__':

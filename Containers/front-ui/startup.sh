@@ -3,3 +3,4 @@
 cd /home/mapr
 export LD_LIBRARY_PATH=/opt/mapr/lib:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server
 python /home/mapr/consumer-flask.py /demos/drone/drone1:frames /demos/drone/drone1:resized /demos/drone/drone1:analyzed
+#gunicorn --worker-class gevent --workers 1 --bind 0.0.0.0:5000 consumer-flask:app

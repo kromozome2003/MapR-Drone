@@ -10,6 +10,8 @@ RUN sudo apt-get install -y python2.7 python-pip
 RUN sudo pip install --upgrade pip
 RUN sudo apt-get install -y python-dev pkg-config
 RUN sudo pip install Flask
+RUN sudo pip install gunicorn
+RUN sudo pip install gevent
 
 EXPOSE 5000/tcp
 
