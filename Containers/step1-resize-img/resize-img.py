@@ -1,5 +1,6 @@
 import sys,io
 import StringIO
+from random import randint
 from PIL import Image
 from confluent_kafka import Consumer, KafkaError, Producer
 
@@ -11,7 +12,8 @@ target_width = int(sys.argv[3])
 print('### Resizing images')
 
 # Build consumer
-consumer = Consumer({'group.id': 'resizedest', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
+consumer_group = randint(2000, 2999)
+consumer = Consumer({'group.id': consumer_group, 'default.topic.config': {'auto.offset.reset': 'earliest'}})
 consumer.subscribe([read_topic])
 # Build producer
 dst_data = sys.argv[2].split(":")
@@ -22,7 +24,7 @@ producer = Producer({'streams.producer.default.stream': dst_stream})
 running = True
 frameId = 0
 while running:
-	msg = consumer.poll(timeout=1.0)
+	msg = consumer.poll(timeout=1)
 	if msg is None: continue
 	if not msg.error():
 		src_image_data = msg.value()
@@ -37,9 +39,9 @@ while running:
 		dst_image_io = StringIO.StringIO()
 		dst_image.save(dst_image_io, format='PNG')
 		producer.produce(dst_topic, dst_image_io.getvalue())
-		producer.flush()
+		#producer.flush()
  	elif msg.error().code() != KafkaError._PARTITION_EOF:
 		print(msg.error())
 		running = False
 	frameId += 1
-consumer.close()
+#consumer.close()
