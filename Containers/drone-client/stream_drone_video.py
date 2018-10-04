@@ -10,23 +10,24 @@ def main():
         # Init a video stream
         container = av.open(drone.get_video_stream())
         # Take Off
-        #drone.takeoff()
+        drone.takeoff()
         # Start Chrono
-        start_time = int(time.time())
         timeout = True
+        start_time = int(time.time())
         # Loop until timeout
         while True:
             for frame in container.decode(video=0):
                 # Store Image name
                 img_name_str = 'frame-%06d.jpg' % frame.index
+                # Convert frame to image
+                frameIMG = cv2.cvtColor(numpy.array(frame.to_image()), cv2.COLOR_RGB2BGR)
+                ret, jpeg = cv2.imencode('.png', frameIMG)
+
                 # If streaming
                 if stream_args:
-                    # Convert frame to image
-                    frameIMG = cv2.cvtColor(numpy.array(frame.to_image()), cv2.COLOR_RGB2BGR)
-                    ret, jpeg = cv2.imencode('.png', frameIMG)
                     print('  ###  Streaming frame : ' + img_name_str)
                     producer.produce(topic, jpeg.tobytes())
-                    producer.flush()
+                    #producer.flush()
 
                 # Time control
                 elapsed_time = int(time.time() - start_time)
@@ -40,7 +41,9 @@ def main():
             # Exit on timeout
             if timeout:
                 print('Flight time expired')
-                break
+                print('Landing...')
+                drone.land()
+                #break
 
     # Catch exceptions
     except Exception as ex:
@@ -50,8 +53,6 @@ def main():
 
     # Clean exit w/landing + disconnect
     finally:
-        print('Landing...')
-        drone.land()
         print('Disconnecting...')
         drone.quit()
 
