@@ -21,7 +21,9 @@ RUN sudo pip install --global-option=build_ext --global-option="--library-dirs=/
 
 # Copy scripts
 RUN mkdir -p /home/mapr/templates
-COPY templates/index.html /home/mapr/templates/
+COPY templates/* /home/mapr/templates/
+RUN mkdir -p /home/mapr/static
+COPY static/* /home/mapr/static/
 COPY consumer-flask.py /home/mapr/
 COPY startup.sh /home/mapr/
 RUN sudo chmod +x /home/mapr/startup.sh
