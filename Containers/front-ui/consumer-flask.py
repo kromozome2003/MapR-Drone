@@ -1,4 +1,5 @@
 import sys,time
+from random import randint
 from flask import Flask, render_template, Response
 from confluent_kafka import Consumer, KafkaError
 
@@ -10,14 +11,15 @@ topic3 = str(sys.argv[3])
 #topic2 = '/demos/drone/drone1:resized'
 #topic3 = '/demos/drone/drone1:analyzed'
 
-sleep_time = .1
+sleep_time = 0
+consumer_group = randint(3000, 3999)
 
 # Build consumer
-consumer_frames = Consumer({'group.id': 'frontui_frames', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
+consumer_frames = Consumer({'group.id': consumer_group, 'default.topic.config': {'auto.offset.reset': 'earliest'}})
 consumer_frames.subscribe([topic1])
-consumer_resized = Consumer({'group.id': 'frontui_resized', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
+consumer_resized = Consumer({'group.id': consumer_group, 'default.topic.config': {'auto.offset.reset': 'earliest'}})
 consumer_resized.subscribe([topic2])
-consumer_analyzed = Consumer({'group.id': 'frontui_analyzed', 'default.topic.config': {'auto.offset.reset': 'earliest'}})
+consumer_analyzed = Consumer({'group.id': consumer_group, 'default.topic.config': {'auto.offset.reset': 'earliest'}})
 consumer_analyzed.subscribe([topic3])
 
 app = Flask(__name__)
@@ -44,7 +46,7 @@ def stream_frames(consumer):
 	print('Start of loop')
 	while running:
 		print('  Polling message')
-		msg = consumer.poll(timeout=0.100)
+		msg = consumer.poll(timeout=1)
 		print('  Message obtained')
 		if msg is None:
 			print('  Message is None')
@@ -58,7 +60,7 @@ def stream_frames(consumer):
 			print('  Bad message')
 			print(msg.error())
 			running = False
-	consumer.close()
+	#consumer.close()
 
 def stream_resized(consumer):
 	running = True
@@ -66,7 +68,7 @@ def stream_resized(consumer):
 	print('Start of loop')
 	while running:
 		print('  Polling message')
-		msg = consumer.poll(timeout=0.100)
+		msg = consumer.poll(timeout=1)
 		print('  Message obtained')
 		if msg is None:
 			print('  Message is None')
@@ -80,7 +82,7 @@ def stream_resized(consumer):
 			print('  Bad message')
 			print(msg.error())
 			running = False
-	consumer.close()
+	#consumer.close()
 
 def stream_analyzed(consumer):
 	running = True
@@ -88,7 +90,7 @@ def stream_analyzed(consumer):
 	print('Start of loop')
 	while running:
 		print('  Polling message')
-		msg = consumer.poll(timeout=0.100)
+		msg = consumer.poll(timeout=1)
 		print('  Message obtained')
 		if msg is None:
 			print('  Message is None')
@@ -102,7 +104,7 @@ def stream_analyzed(consumer):
 			print('  Bad message')
 			print(msg.error())
 			running = False
-	consumer.close()
+	#consumer.close()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
