@@ -53,6 +53,10 @@ This is the reason why I decided to detect objects from the MapR cluster itself 
 * Container #5 (front-ui) is a web server (based on Flask) to display streams results in realtime at the different stages of the DIP (Distributed Image Processing)
 Those 3 containers are based on MapR PACC images to consume MapR streams
 
+## On your laptop
+Install XQuartz (x86 graphical server) to be able to export display from the MapR VM (used to detect objects)
+To use with with: ssh -Y user@maprnode (this will export your display)
+
 ## Setup the MapR streams
 Assuming your MapR cluster/sandbox is up & running w/IP 192.168.56.101 and you have a valid license for streams
 Create the required streams & topics for this demo on MapR cluster
@@ -60,6 +64,7 @@ We will use the clean-stream.sh script that clean & recreate the streams
 ```
 ssh 192.168.56.101
 sudo mkdir -p /mapr/demo.mapr.com/demos/drone
+maprcli stream create -path /demos/drone/drone1 -produceperm p -consumeperm p -topicperm p -copyperm p -adminperm p
 maprcli stream topic delete -path /demos/drone/drone1 -topic frames
 maprcli stream topic delete -path /demos/drone/drone1 -topic resized
 maprcli stream topic delete -path /demos/drone/drone1 -topic analyzed
@@ -102,11 +107,40 @@ To change the option, edit the file MapR-Drone/Containers/drone-client/startup.s
 
 ### Container #3 (step2-detect-obj) VM in my case
 ```
-ssh <your MapR cluster>
+ssh -Y <user>@<your MapR cluster>
 git clone https://github.com/kromozome2003/MapR-Drone.git
 cd MapR-Drone/Containers/step2-detect-obj
+```
+Download the YOLO tiny caffe model [HERE](https://drive.google.com/file/d/0Bzy9LxvTYIgKNFEzOEdaZ3U0Nms/view?usp=sharing)
+And copy this model to your MapR VM MapR-Drone/Containers/step2-detect-obj/weights/yolo_tiny.caffemodel
+```
+mvNCCompile prototxt/yolo_tiny_deploy.prototxt -w weights/yolo_tiny.caffemodel -s 12
+```
+Then install missing packages + kafka client
+```
+pip install --upgrade pip
+pip install Pillow
+pip install requests
+pip install scikit-image
+sudo apt-get install python-skimage
+sudo pip install --global-option=build_ext --global-option="--library-dirs=/opt/mapr/lib" --global-option="--include-dirs=/opt/mapr/include/" mapr-streams-python
+```
+Finally export the kafka libs and run the detection
+```
+export LD_LIBRARY_PATH=/opt/mapr/lib:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server
 python py_examples/object_detection_app.py
 ```
 
 ## Visit the web page to see live streaming from the Drone
 [http://localhost:5000/](http://localhost:5000/)
+
+## Known issues :
+When building container image got error message FFMPEG 3.2 or later required with pip install av
+
+Edit Dockerfile / added the following lines to install FFMPEG-3.x
+
+RUN sudo apt-get install -y python-dev pkg-config
+RUN sudo apt-get install -y software-properties-common
+RUN sudo add-apt-repository ppa:jonathonf/ffmpeg-3
+RUN sudo apt-get update && sudo apt install -y ffmpeg libav-tools x264 x265
+RUN sudo apt-get install -y libavformat-dev
